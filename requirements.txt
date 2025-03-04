@@ -5,7 +5,7 @@ joblib==1.3.2         # 1.4.2 tidak tersedia, gunakan 1.3.2
 MarkupSafe==2.1.3     # 2.1.5 tidak tersedia, gunakan 2.1.3
 mpmath==1.3.0         # Tetap karena tersedia
 networkx==3.1         # 3.4.2 tidak tersedia, gunakan 3.1
-numpy==1.26.4         # Tetap karena tersedia
+numpy==1.24.4         # Tetap karena tersedia
 scikit-learn==1.3.2   # 1.6.1 tidak tersedia, gunakan 1.3.2
 scipy==1.11.4         # 1.15.2 tidak tersedia, gunakan 1.11.4
 sympy==1.12           # 1.13.1 tidak tersedia, gunakan 1.12
