@@ -21,8 +21,7 @@ jobs:
           python-version: '3.8'
 
       - name: Install dependencies
-        run: pip install -r .github/workflows/main.yml
-requirements.txt
+        run: pip install -r requirements.txt
 
       - name: Jalankan model
         run: python main.py
