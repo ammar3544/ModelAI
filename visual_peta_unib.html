@@ -1,0 +1,695 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Algoritma Dijkstra - Universitas Bengkulu</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .main-content {
+            display: flex;
+            gap: 20px;
+            padding: 30px;
+        }
+
+        .controls {
+            width: 350px;
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 25px;
+            height: fit-content;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+        }
+
+        .controls h3 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+            font-size: 1.4em;
+            text-align: center;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #34495e;
+        }
+
+        select, button {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        select:focus {
+            outline: none;
+            border-color: #3498db;
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+        }
+
+        button {
+            background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 10px;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(52, 152, 219, 0.4);
+        }
+
+        .reset-btn {
+            background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+            margin-top: 10px;
+        }
+
+        .reset-btn:hover {
+            box-shadow: 0 5px 15px rgba(231, 76, 60, 0.4);
+        }
+
+        .visualization {
+            flex: 1;
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+        }
+
+        #graph-container {
+            width: 100%;
+            height: 600px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            background: white;
+            position: relative;
+            overflow: hidden;
+        }
+
+        #graph-svg {
+            width: 100%;
+            height: 100%;
+        }
+
+        .node {
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .node:hover {
+            transform: scale(1.1);
+        }
+
+        .node-circle {
+            fill: #3498db;
+            stroke: #2980b9;
+            stroke-width: 2;
+        }
+
+        .node-circle.start {
+            fill: #27ae60;
+            stroke: #229954;
+        }
+
+        .node-circle.end {
+            fill: #e74c3c;
+            stroke: #c0392b;
+        }
+
+        .node-circle.path {
+            fill: #f39c12;
+            stroke: #e67e22;
+        }
+
+        .node-circle.visited {
+            fill: #9b59b6;
+            stroke: #8e44ad;
+        }
+
+        .node-text {
+            fill: white;
+            font-size: 10px;
+            font-weight: bold;
+            text-anchor: middle;
+            dominant-baseline: middle;
+        }
+
+        .edge {
+            stroke: #bdc3c7;
+            stroke-width: 2;
+            transition: all 0.3s ease;
+        }
+
+        .edge.path {
+            stroke: #f39c12;
+            stroke-width: 4;
+            animation: pathPulse 2s infinite;
+        }
+
+        @keyframes pathPulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.6; }
+        }
+
+        .edge-label {
+            fill: #34495e;
+            font-size: 11px;
+            font-weight: bold;
+            text-anchor: middle;
+            dominant-baseline: middle;
+            background: white;
+            padding: 2px 4px;
+            border-radius: 3px;
+        }
+
+        .result-panel {
+            margin-top: 20px;
+            padding: 20px;
+            background: #ecf0f1;
+            border-radius: 10px;
+            border-left: 5px solid #3498db;
+        }
+
+        .result-panel h4 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            font-size: 1.2em;
+        }
+
+        .path-info {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        .distance-info {
+            font-size: 1.1em;
+            font-weight: bold;
+            color: #27ae60;
+            margin-bottom: 10px;
+        }
+
+        .step {
+            padding: 8px 12px;
+            margin: 5px 0;
+            background: #f8f9fa;
+            border-radius: 5px;
+            border-left: 3px solid #3498db;
+        }
+
+        .legend {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 20px;
+            padding: 15px;
+            background: #ecf0f1;
+            border-radius: 10px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .legend-color {
+            width: 15px;
+            height: 15px;
+            border-radius: 50%;
+            border: 2px solid rgba(0,0,0,0.2);
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+            color: #7f8c8d;
+        }
+
+        .loading.show {
+            display: block;
+        }
+
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #3498db;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 10px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 1200px) {
+            .main-content {
+                flex-direction: column;
+            }
+            
+            .controls {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🗺️ Algoritma Dijkstra</h1>
+            <p>Visualisasi Pencarian Jalur Terpendek - Universitas Bengkulu</p>
+        </div>
+
+        <div class="main-content">
+            <div class="controls">
+                <h3>🎯 Pengaturan Rute</h3>
+                
+                <div class="form-group">
+                    <label for="start-node">📍 Titik Awal:</label>
+                    <select id="start-node">
+                        <option value="">Pilih titik awal...</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="end-node">🎯 Titik Tujuan:</label>
+                    <select id="end-node">
+                        <option value="">Pilih titik tujuan...</option>
+                    </select>
+                </div>
+
+                <button id="find-path-btn">🔍 Cari Jalur Terpendek</button>
+                <button id="reset-btn" class="reset-btn">🔄 Reset</button>
+
+                <div id="result-panel" class="result-panel" style="display: none;">
+                    <h4>📋 Hasil Pencarian</h4>
+                    <div id="path-result"></div>
+                </div>
+            </div>
+
+            <div class="visualization">
+                <div id="graph-container">
+                    <svg id="graph-svg"></svg>
+                    <div id="loading" class="loading">
+                        <div class="spinner"></div>
+                        <p>Mencari jalur terpendek...</p>
+                    </div>
+                </div>
+
+                <div class="legend">
+                    <div class="legend-item">
+                        <div class="legend-color" style="background-color: #3498db;"></div>
+                        <span>Node Biasa</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background-color: #27ae60;"></div>
+                        <span>Titik Awal</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background-color: #e74c3c;"></div>
+                        <span>Titik Tujuan</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background-color: #f39c12;"></div>
+                        <span>Jalur Terpendek</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background-color: #9b59b6;"></div>
+                        <span>Node Dikunjungi</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Data graf berdasarkan peta UNIB
+        const nodes = {
+            'SD_NEGERI_86': { name: 'SD Negeri 86', x: 100, y: 50 },
+            'PEMAKAMAN_UMUM': { name: 'Pemakaman Umum', x: 200, y: 80 },
+            'LAB_AGRONOMI': { name: 'Lab Agronomi', x: 300, y: 120 },
+            'GEDUNG_LAYANAN': { name: 'Gedung Layanan Terpadu', x: 250, y: 200 },
+            'GEDUNG_C': { name: 'Gedung C', x: 150, y: 250 },
+            'GEDUNG_I': { name: 'Gedung I', x: 200, y: 350 },
+            'DEKANAT_HUKUM': { name: 'Dekanat Hukum', x: 150, y: 400 },
+            'GEDUNG_K': { name: 'Gedung K', x: 250, y: 450 },
+            'REKTORAT': { name: 'Rektorat', x: 350, y: 280 },
+            'LPTIK': { name: 'LPTIK', x: 450, y: 250 },
+            'GEDUNG_SERBA_GUNA': { name: 'Gedung Serba Guna', x: 500, y: 200 },
+            'PERPUSTAKAAN': { name: 'Perpustakaan', x: 400, y: 150 },
+            'DEKANAT_FMIPA': { name: 'Dekanat FMIPA', x: 550, y: 150 },
+            'GB3_DAN4': { name: 'GB 3 dan 4', x: 600, y: 200 },
+            'FAKULTAS_KEDOKTERAN': { name: 'Fakultas Kedokteran', x: 650, y: 100 },
+            'SEKRETARIAT_PMII': { name: 'Sekretariat PMII', x: 700, y: 250 },
+            'MASJID_AL_IKHLAS': { name: 'Masjid Al-Ikhlas', x: 750, y: 200 },
+            'STADION': { name: 'Stadion UNIB', x: 800, y: 150 }
+        };
+
+        const edges = {
+            'SD_NEGERI_86': { 'PEMAKAMAN_UMUM': 300, 'LAB_AGRONOMI': 400 },
+            'PEMAKAMAN_UMUM': { 'SD_NEGERI_86': 300, 'LAB_AGRONOMI': 200, 'PERPUSTAKAAN': 250 },
+            'LAB_AGRONOMI': { 'SD_NEGERI_86': 400, 'PEMAKAMAN_UMUM': 200, 'GEDUNG_LAYANAN': 150, 'PERPUSTAKAAN': 300 },
+            'GEDUNG_LAYANAN': { 'LAB_AGRONOMI': 150, 'GEDUNG_C': 200, 'REKTORAT': 180 },
+            'GEDUNG_C': { 'GEDUNG_LAYANAN': 200, 'GEDUNG_I': 150, 'DEKANAT_HUKUM': 180, 'REKTORAT': 220 },
+            'GEDUNG_I': { 'GEDUNG_C': 150, 'DEKANAT_HUKUM': 120, 'GEDUNG_K': 200 },
+            'DEKANAT_HUKUM': { 'GEDUNG_C': 180, 'GEDUNG_I': 120, 'GEDUNG_K': 250, 'REKTORAT': 300 },
+            'GEDUNG_K': { 'GEDUNG_I': 200, 'DEKANAT_HUKUM': 250 },
+            'REKTORAT': { 'GEDUNG_LAYANAN': 180, 'GEDUNG_C': 220, 'DEKANAT_HUKUM': 300, 'LPTIK': 150, 'PERPUSTAKAAN': 200 },
+            'LPTIK': { 'REKTORAT': 150, 'GEDUNG_SERBA_GUNA': 120, 'PERPUSTAKAAN': 180 },
+            'GEDUNG_SERBA_GUNA': { 'LPTIK': 120, 'PERPUSTAKAAN': 100, 'DEKANAT_FMIPA': 200, 'GB3_DAN4': 180 },
+            'PERPUSTAKAAN': { 'PEMAKAMAN_UMUM': 250, 'LAB_AGRONOMI': 300, 'REKTORAT': 200, 'LPTIK': 180, 'GEDUNG_SERBA_GUNA': 100, 'DEKANAT_FMIPA': 150 },
+            'DEKANAT_FMIPA': { 'GEDUNG_SERBA_GUNA': 200, 'PERPUSTAKAAN': 150, 'GB3_DAN4': 100, 'FAKULTAS_KEDOKTERAN': 250 },
+            'GB3_DAN4': { 'GEDUNG_SERBA_GUNA': 180, 'DEKANAT_FMIPA': 100, 'FAKULTAS_KEDOKTERAN': 200, 'SEKRETARIAT_PMII': 150, 'MASJID_AL_IKHLAS': 300 },
+            'FAKULTAS_KEDOKTERAN': { 'DEKANAT_FMIPA': 250, 'GB3_DAN4': 200, 'SEKRETARIAT_PMII': 180 },
+            'SEKRETARIAT_PMII': { 'GB3_DAN4': 150, 'FAKULTAS_KEDOKTERAN': 180, 'MASJID_AL_IKHLAS': 200, 'STADION': 250 },
+            'MASJID_AL_IKHLAS': { 'GB3_DAN4': 300, 'SEKRETARIAT_PMII': 200, 'STADION': 150 },
+            'STADION': { 'SEKRETARIAT_PMII': 250, 'MASJID_AL_IKHLAS': 150 }
+        };
+
+        let currentPath = [];
+        let currentStart = null;
+        let currentEnd = null;
+
+        // Inisialisasi
+        function init() {
+            populateDropdowns();
+            drawGraph();
+            setupEventListeners();
+        }
+
+        // Mengisi dropdown dengan pilihan node
+        function populateDropdowns() {
+            const startSelect = document.getElementById('start-node');
+            const endSelect = document.getElementById('end-node');
+
+            Object.entries(nodes).forEach(([key, value]) => {
+                const option1 = document.createElement('option');
+                option1.value = key;
+                option1.textContent = value.name;
+                startSelect.appendChild(option1);
+
+                const option2 = document.createElement('option');
+                option2.value = key;
+                option2.textContent = value.name;
+                endSelect.appendChild(option2);
+            });
+        }
+
+        // Menggambar graf
+        function drawGraph() {
+            const svg = document.getElementById('graph-svg');
+            svg.innerHTML = '';
+
+            // Gambar edges
+            Object.entries(edges).forEach(([from, connections]) => {
+                Object.entries(connections).forEach(([to, weight]) => {
+                    const fromNode = nodes[from];
+                    const toNode = nodes[to];
+                    
+                    // Line
+                    const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                    line.setAttribute('x1', fromNode.x);
+                    line.setAttribute('y1', fromNode.y);
+                    line.setAttribute('x2', toNode.x);
+                    line.setAttribute('y2', toNode.y);
+                    line.setAttribute('class', 'edge');
+                    line.setAttribute('id', `edge-${from}-${to}`);
+                    svg.appendChild(line);
+
+                    // Weight label
+                    const midX = (fromNode.x + toNode.x) / 2;
+                    const midY = (fromNode.y + toNode.y) / 2;
+                    
+                    const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                    text.setAttribute('x', midX);
+                    text.setAttribute('y', midY);
+                    text.setAttribute('class', 'edge-label');
+                    text.textContent = weight + 'm';
+                    svg.appendChild(text);
+                });
+            });
+
+            // Gambar nodes
+            Object.entries(nodes).forEach(([key, value]) => {
+                const group = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+                group.setAttribute('class', 'node');
+                group.setAttribute('id', `node-${key}`);
+
+                // Circle
+                const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+                circle.setAttribute('cx', value.x);
+                circle.setAttribute('cy', value.y);
+                circle.setAttribute('r', 20);
+                circle.setAttribute('class', 'node-circle');
+                group.appendChild(circle);
+
+                // Text
+                const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                text.setAttribute('x', value.x);
+                text.setAttribute('y', value.y);
+                text.setAttribute('class', 'node-text');
+                text.textContent = key.substring(0, 3);
+                group.appendChild(text);
+
+                // Label
+                const label = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                label.setAttribute('x', value.x);
+                label.setAttribute('y', value.y + 35);
+                label.setAttribute('class', 'edge-label');
+                label.textContent = value.name;
+                group.appendChild(label);
+
+                svg.appendChild(group);
+            });
+        }
+
+        // Algoritma Dijkstra
+        function dijkstra(start, end) {
+            const distances = {};
+            const predecessors = {};
+            const unvisited = new Set();
+
+            // Inisialisasi
+            Object.keys(nodes).forEach(node => {
+                distances[node] = Infinity;
+                unvisited.add(node);
+            });
+            distances[start] = 0;
+
+            while (unvisited.size > 0) {
+                // Cari node dengan jarak terkecil
+                let current = null;
+                let currentDistance = Infinity;
+                
+                for (const node of unvisited) {
+                    if (distances[node] < currentDistance) {
+                        current = node;
+                        currentDistance = distances[node];
+                    }
+                }
+
+                if (current === null || distances[current] === Infinity) break;
+
+                unvisited.delete(current);
+
+                // Update jarak ke tetangga
+                if (edges[current]) {
+                    Object.entries(edges[current]).forEach(([neighbor, weight]) => {
+                        if (unvisited.has(neighbor)) {
+                            const newDistance = distances[current] + weight;
+                            if (newDistance < distances[neighbor]) {
+                                distances[neighbor] = newDistance;
+                                predecessors[neighbor] = current;
+                            }
+                        }
+                    });
+                }
+            }
+
+            // Rekonstruksi jalur
+            const path = [];
+            let current = end;
+            while (current !== undefined) {
+                path.unshift(current);
+                current = predecessors[current];
+            }
+
+            return { path, distance: distances[end] };
+        }
+
+        // Visualisasi jalur
+        function visualizePath(path, distance) {
+            // Reset semua node dan edge
+            document.querySelectorAll('.node-circle').forEach(circle => {
+                circle.className = 'node-circle';
+            });
+            document.querySelectorAll('.edge').forEach(edge => {
+                edge.className = 'edge';
+            });
+
+            if (path.length === 0) return;
+
+            // Highlight start dan end
+            const startCircle = document.querySelector(`#node-${path[0]} .node-circle`);
+            const endCircle = document.querySelector(`#node-${path[path.length - 1]} .node-circle`);
+            
+            if (startCircle) startCircle.classList.add('start');
+            if (endCircle) endCircle.classList.add('end');
+
+            // Highlight path nodes
+            path.slice(1, -1).forEach(node => {
+                const circle = document.querySelector(`#node-${node} .node-circle`);
+                if (circle) circle.classList.add('path');
+            });
+
+            // Highlight path edges
+            for (let i = 0; i < path.length - 1; i++) {
+                const from = path[i];
+                const to = path[i + 1];
+                const edge1 = document.getElementById(`edge-${from}-${to}`);
+                const edge2 = document.getElementById(`edge-${to}-${from}`);
+                
+                if (edge1) edge1.classList.add('path');
+                if (edge2) edge2.classList.add('path');
+            }
+
+            // Tampilkan hasil
+            displayResult(path, distance);
+        }
+
+        // Tampilkan hasil
+        function displayResult(path, distance) {
+            const resultPanel = document.getElementById('result-panel');
+            const pathResult = document.getElementById('path-result');
+
+            if (path.length === 0 || distance === Infinity) {
+                pathResult.innerHTML = '<div class="path-info">❌ Tidak ada jalur yang ditemukan!</div>';
+            } else {
+                let html = `
+                    <div class="path-info">
+                        <div class="distance-info">📏 Jarak Total: ${distance} meter</div>
+                        <div><strong>🛣️ Rute:</strong></div>
+                `;
+
+                path.forEach((node, index) => {
+                    const nodeName = nodes[node].name;
+                    if (index === 0) {
+                        html += `<div class="step">📍 ${index + 1}. ${nodeName} (Titik Awal)</div>`;
+                    } else if (index === path.length - 1) {
+                        html += `<div class="step">🎯 ${index + 1}. ${nodeName} (Tujuan)</div>`;
+                    } else {
+                        html += `<div class="step">➡️ ${index + 1}. ${nodeName}</div>`;
+                    }
+                });
+
+                html += '</div>';
+                pathResult.innerHTML = html;
+            }
+
+            resultPanel.style.display = 'block';
+        }
+
+        // Setup event listeners
+        function setupEventListeners() {
+            document.getElementById('find-path-btn').addEventListener('click', () => {
+                const start = document.getElementById('start-node').value;
+                const end = document.getElementById('end-node').value;
+
+                if (!start || !end) {
+                    alert('⚠️ Silakan pilih titik awal dan tujuan!');
+                    return;
+                }
+
+                if (start === end) {
+                    alert('⚠️ Titik awal dan tujuan harus berbeda!');
+                    return;
+                }
+
+                // Tampilkan loading
+                const loading = document.getElementById('loading');
+                loading.classList.add('show');
+
+                // Simulasi delay untuk efek loading
+                setTimeout(() => {
+                    const result = dijkstra(start, end);
+                    visualizePath(result.path, result.distance);
+                    currentPath = result.path;
+                    currentStart = start;
+                    currentEnd = end;
+                    loading.classList.remove('show');
+                }, 1000);
+            });
+
+            document.getElementById('reset-btn').addEventListener('click', () => {
+                document.getElementById('start-node').value = '';
+                document.getElementById('end-node').value = '';
+                document.getElementById('result-panel').style.display = 'none';
+                currentPath = [];
+                currentStart = null;
+                currentEnd = null;
+                drawGraph();
+            });
+        }
+
+        // Jalankan inisialisasi
+        init();
+    </script>
+</body>
+</html>
