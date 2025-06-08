@@ -121,3 +121,5 @@
 | **Dashboard Admin**            | Monitoring kemacetan dan laporan statistik   |
 | **Prediksi Musiman**           | Antisipasi kemacetan saat libur Lebaran      |
 | **Navigasi Transportasi Umum** | Rekomendasi angkot/bus sebagai alternatif    |
+
+Cek Situsnya : https://ammar3544.github.io/ModelAI/prediksi_kemacetan.html
